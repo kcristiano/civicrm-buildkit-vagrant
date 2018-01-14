@@ -29,21 +29,25 @@ apt_package_check_list=(
   acl
   git
   wget
-  mysql-server
-  mysql-client
-  php5-cli
-  php5-imap
-  php5-ldap
-  php5-curl
-  php5-mysql
-  php5-intl
-  php5-gd
-  php5-mcrypt
-  php5-xdebug
+  mariadb-server
+  mariadb-client
+  php7.0-cli
+  php7.0-imap
+  php7.0-ldap
+  php7.0-curl
+  php7.0-mysql
+  php7.0-intl
+  php7.0-gd
+  php7.0-mcrypt
+  php7.0-xdebug
+  php7.0-xml
+  php7.0-mbstring
+  php7.0-bcmath
+  php7.0-soap
+  php7.0-zip
   php-apc
   apache2
-  libapache2-mod-php5
-  npm
+  libapache2-mod-php7.0
   phantomjs
   ruby
   ruby-dev
@@ -63,10 +67,10 @@ apt_package_check_list=(
   patch
   postfix
   php-pear
-  php5-dev
+  php7.0-dev
   libcurl3-openssl-dev
 
-  # dnsmasq to redirect *.dev to locahost
+  # dnsmasq to redirect *.test to locahost
   dnsmasq
 
   # ntp service to keep clock current
@@ -151,6 +155,9 @@ profile_setup() {
 package_check() {
   # Loop through each of our packages that should be installed on the system. If
   # not yet installed, it should be added to the array of packages to install.
+  sudo apt-get install -y python-software-properties
+  sudo add-apt-repository -y ppa:ondrej/php
+  sudo apt-get update -y
   local pkg
   local package_version
 
@@ -186,11 +193,11 @@ package_install() {
   # Postfix
   #
   # Use debconf-set-selections to specify the selections in the postfix setup. Set
-  # up as an 'Internet Site' with the host name 'civi.dev'. Note that if your current
+  # up as an 'Internet Site' with the host name 'civi.test'. Note that if your current
   # Internet connection does not allow communication over port 25, you will not be
   # able to send mail, even with postfix installed.
   echo postfix postfix/main_mailer_type select Internet Site | debconf-set-selections
-  echo postfix postfix/mailname string civi.dev | debconf-set-selections
+  echo postfix postfix/mailname string civi.test | debconf-set-selections
 
   # Disable ipv6 as some ISPs/mail servers have problems with it
   echo "inet_protocols = ipv4" >> "/etc/postfix/main.cf"
@@ -214,14 +221,15 @@ package_install() {
 tools_install() {
   # npm
   #
+  # nodejs
+  # Install suported version of nodejs
+  curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+  apt-get install -y nodejs
+  apt-get install -y npm
+
   # Make sure we have the latest npm version and the update checker module
   npm install -g npm
   npm install -g npm-check-updates
-
-  # nodejs
-  # Install suported version of nodejs
-  curl -sL https://deb.nodesource.com/setup_5.x | bash -
-  apt-get install -y nodejs
 
   # xdebug
   #
@@ -291,8 +299,8 @@ apache2_setup() {
   a2enmod ssl
 
   # PHP packages that need extra setup
-  php5enmod mcrypt
-  php5enmod imap
+  phpenmod mcrypt
+  phpenmod imap
 
   # Restart Apache
   apache2ctl restart
@@ -360,7 +368,7 @@ mailcatcher_setup_gem() {
 # Make php use it to send mail
   cp "/srv/config/php5-fpm-config/mailcatcher-gem.ini" "/etc/php5/mods-available/mailcatcher.ini"
 # Notify php mod manager (5.5+)
-  sudo php5enmod mailcatcher
+  sudo phpenmod mailcatcher
 
 # Start it now
 /usr/bin/env $(which mailcatcher) --ip=0.0.0.0
@@ -434,13 +442,13 @@ services_restart() {
   service mailcatcher restart
 
   # Disable PHP Xdebug module by default
-  php5dismod xdebug
+  phpdismod xdebug
 
   # Enable PHP mcrypt module by default
-  php5enmod mcrypt
+  phpenmod mcrypt
 
   # Enable PHP mailcatcher sendmail settings by default
-  php5enmod mailcatcher
+  phpenmod mailcatcher
 
   # Add the vagrant user to the www-data group so that it has better access
   # to PHP and Nginx related files.
