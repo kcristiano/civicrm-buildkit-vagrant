@@ -12,7 +12,7 @@ fi
 # Download buildkit from the git repo
 if [ ! -d "$HOME/buildkit" ]; then
   echo "Downloading buildkit..."
-  git clone https://github.com/civicrm/civicrm-buildkit.git $HOME/buildkit
+  git clone https://github.com/kcristiano/civicrm-buildkit.git -b wpgit $HOME/buildkit
 else
   echo "Updating buildkit..."
   cd $HOME/buildkit
