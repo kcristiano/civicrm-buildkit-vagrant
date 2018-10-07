@@ -31,23 +31,23 @@ apt_package_check_list=(
   wget
   mariadb-server
   mariadb-client
-  php7.0-cli
-  php7.0-imap
-  php7.0-ldap
-  php7.0-curl
-  php7.0-mysql
-  php7.0-intl
-  php7.0-gd
-  php7.0-mcrypt
-  php7.0-xdebug
-  php7.0-xml
-  php7.0-mbstring
-  php7.0-bcmath
-  php7.0-soap
-  php7.0-zip
+  php7.1-cli
+  php7.1-imap
+  php7.1-ldap
+  php7.1-curl
+  php7.1-mysql
+  php7.1-intl
+  php7.1-gd
+  php7.1-mcrypt
+  php7.1-xdebug
+  php7.1-xml
+  php7.1-mbstring
+  php7.1-bcmath
+  php7.1-soap
+  php7.1-zip
   php-apc
   apache2
-  libapache2-mod-php7.0
+  libapache2-mod-php7.1
   phantomjs
   ruby
   ruby-dev
@@ -67,7 +67,7 @@ apt_package_check_list=(
   patch
   postfix
   php-pear
-  php7.0-dev
+  php7.1-dev
   libcurl3-openssl-dev
 
   # dnsmasq to redirect *.test to locahost
@@ -179,7 +179,7 @@ package_install() {
   package_check
 
   # dnsmasq configuration
-  echo "address=/dev/127.0.0.1" >> /etc/dnsmasq.conf
+  echo "address=/dev/127.1.0.1" >> /etc/dnsmasq.conf
   service dnsmasq restart
 
   # MySQL
@@ -222,8 +222,8 @@ tools_install() {
   # npm
   #
   # nodejs
-  # Install suported version of nodejs
-  curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+  # Install supported version of nodejs
+  curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
   apt-get install -y nodejs
   apt-get install -y npm
 
@@ -366,7 +366,7 @@ mailcatcher_setup_gem() {
   cp "/srv/config/init/mailcatcher-gem.conf"  "/etc/init/mailcatcher.conf"
 
 # Make php use it to send mail
-  cp "/srv/config/php5-fpm-config/mailcatcher-gem.ini" "/etc/php5/mods-available/mailcatcher.ini"
+  cp "/srv/config/php5-fpm-config/mailcatcher-gem.ini" "/etc/php7.1/mods-available/mailcatcher.ini"
 # Notify php mod manager (5.5+)
   sudo phpenmod mailcatcher
 
